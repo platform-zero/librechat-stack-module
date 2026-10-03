@@ -87,5 +87,19 @@ services:
       retries: 5
       start_period: "90s"
     restart: "unless-stopped"
-networks: {}
-volumes: {}
+networks:
+  caddy: {}
+  librechat-internal:
+    driver: bridge
+    internal: true
+volumes:
+  librechat_mongodb:
+    hostPath: "${STACK_VOLUME_ROOT}/librechat_mongodb"
+  librechat_meilisearch:
+    hostPath: "${STACK_VOLUME_ROOT}/librechat_meilisearch"
+  librechat_data:
+    hostPath: "${STACK_VOLUME_ROOT}/librechat_data"
+  librechat_uploads:
+    hostPath: "${STACK_VOLUME_ROOT}/librechat_uploads"
+  librechat_images:
+    hostPath: "${STACK_VOLUME_ROOT}/librechat_images"
