@@ -8,7 +8,7 @@ endpoints:
       headers:
         X-P0-Subject: "\u007b\u007bLIBRECHAT_USER_OPENIDID\u007d\u007d"
       models:
-        default: ["p0/default"]
+        default: ["p0/default", "p0/agent"]
         fetch: false
       titleConvo: true
       titleModel: "p0/default"
