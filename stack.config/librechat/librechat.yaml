@@ -1,0 +1,15 @@
+version: 1.2.1
+cache: true
+endpoints:
+  custom:
+    - name: Platform Zero
+      apiKey: "${P0_MODEL_GATEWAY_SECRET}"
+      baseURL: "http://192.168.122.235:24837/v1"
+      headers:
+        X-P0-Subject: "{{LIBRECHAT_USER_OPENIDID}}"
+      models:
+        default: ["p0/default"]
+        fetch: false
+      titleConvo: true
+      titleModel: "p0/default"
+      modelDisplayLabel: Platform Zero

@@ -1,0 +1,91 @@
+---
+schemaVersion: 1
+module: "librechat"
+target: "apps"
+services:
+  librechat-mongodb:
+    image: "mongo:8.0.20"
+    containerName: "librechat-mongodb"
+    lifecycle: "daemon"
+    updatePolicy: "registry"
+    placement: "rootful"
+    networks:
+      librechat-internal: null
+    volumes:
+      - "librechat_mongodb:/data/db"
+    health:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ping:1}).ok"]
+      interval: "30s"
+      timeout: "10s"
+      retries: 5
+      start_period: "45s"
+    restart: "unless-stopped"
+  librechat-meilisearch:
+    image: "getmeili/meilisearch:v1.35.1"
+    containerName: "librechat-meilisearch"
+    lifecycle: "daemon"
+    updatePolicy: "registry"
+    placement: "rootful"
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_MASTER_KEY: "${LIBRECHAT_MEILI_MASTER_KEY}"
+    networks:
+      librechat-internal: null
+    volumes:
+      - "librechat_meilisearch:/meili_data"
+    restart: "unless-stopped"
+  librechat:
+    image: "registry.librechat.ai/librechat-ai/librechat-dev-api@sha256:2426a3c58564fd3a95c3c1e5118312c4af2f3c87ebde9b7615a4caa36c183fe6"
+    containerName: "librechat"
+    lifecycle: "daemon"
+    updatePolicy: "registry"
+    placement: "rootful"
+    dependencies:
+      librechat-mongodb: "healthy"
+      librechat-meilisearch: "started"
+      keycloak: "healthy"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "3080"
+      NODE_ENV: "production"
+      DOMAIN_CLIENT: "https://ai.${DOMAIN}"
+      DOMAIN_SERVER: "https://ai.${DOMAIN}"
+      MONGO_URI: "mongodb://librechat-mongodb:27017/LibreChat"
+      SEARCH: "true"
+      MEILI_HOST: "http://librechat-meilisearch:7700"
+      MEILI_MASTER_KEY: "${LIBRECHAT_MEILI_MASTER_KEY}"
+      MEILI_NO_ANALYTICS: "true"
+      ALLOW_EMAIL_LOGIN: "false"
+      ALLOW_REGISTRATION: "false"
+      ALLOW_SOCIAL_LOGIN: "true"
+      OPENID_BUTTON_LABEL: "Sign in with Platform Zero"
+      OPENID_ISSUER: "https://keycloak.${DOMAIN}/realms/webservices"
+      OPENID_CLIENT_ID: "librechat"
+      OPENID_CLIENT_SECRET: "${LIBRECHAT_OAUTH_SECRET}"
+      OPENID_SESSION_SECRET: "${LIBRECHAT_OPENID_SESSION_SECRET}"
+      OPENID_CALLBACK_URL: "/oauth/openid/callback"
+      OPENID_SCOPE: "openid profile email"
+      OPENID_USE_END_SESSION_ENDPOINT: "true"
+      JWT_SECRET: "${LIBRECHAT_JWT_SECRET}"
+      JWT_REFRESH_SECRET: "${LIBRECHAT_JWT_REFRESH_SECRET}"
+      CREDS_KEY: "${LIBRECHAT_CREDS_KEY}"
+      CREDS_IV: "${LIBRECHAT_CREDS_IV}"
+      P0_MODEL_GATEWAY_SECRET: "${P0_MODEL_GATEWAY_SECRET}"
+      LIBRECHAT_TEMP_CREDENTIALS_PATH: "/app/data/.env.temp"
+    networks:
+      caddy: null
+      librechat-internal: null
+    volumes:
+      - "./configs/librechat/librechat.yaml:/app/librechat.yaml:ro"
+      - "librechat_data:/app/data"
+      - "librechat_uploads:/app/uploads"
+      - "librechat_images:/app/client/public/images"
+    health:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3080/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: "30s"
+      timeout: "10s"
+      retries: 5
+      start_period: "90s"
+    restart: "unless-stopped"
+networks: {}
+volumes: {}

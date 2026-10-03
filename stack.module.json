@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "librechat",
+  "repo": "librechat-stack-module",
+  "runtimeId": "librechat",
+  "lifecycle": "active",
+  "dependencies": ["stack-foundation"],
+  "runtimeDependencies": ["stack-foundation", "keycloak"],
+  "contracts": ["module-contract"],
+  "smoke": "external-only",
+  "smokeUnsupportedReason": "requires stack secrets, Keycloak, and the private P0 model gateway",
+  "overlays": ["stack.config/librechat", "stack.runtime.yaml"],
+  "testAssets": []
+}
