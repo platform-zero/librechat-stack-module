@@ -6,7 +6,7 @@ endpoints:
       apiKey: "${P0_MODEL_GATEWAY_SECRET}"
       baseURL: "http://192.168.122.235:24837/v1"
       headers:
-        X-P0-Subject: "{{LIBRECHAT_USER_OPENIDID}}"
+        X-P0-Subject: "\u007b\u007bLIBRECHAT_USER_OPENIDID\u007d\u007d"
       models:
         default: ["p0/default"]
         fetch: false
