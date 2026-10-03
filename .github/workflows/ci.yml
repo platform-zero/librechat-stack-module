@@ -1,0 +1,17 @@
+name: Module CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    uses: platform-zero/.github/.github/workflows/module-ci.yml@f1fbbd3cbbf7778dbcb0955c2e4fe51366a2e7e3
+    with:
+      generator_ref: 90acc88e25815a797310fdb32bfbe3ace70c65c4
